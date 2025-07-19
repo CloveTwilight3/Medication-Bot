@@ -1,0 +1,11 @@
+services:
+  medication-bot:
+    build: .
+    container_name: medication-reminder-bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+    environment:
+      - TZ=Europe/London

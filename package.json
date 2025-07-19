@@ -1,0 +1,22 @@
+{
+  "name": "medication-reminder-bot",
+  "version": "1.0.0",
+  "description": "Discord bot for medication reminders",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "node-cron": "^3.0.3",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "@types/node-cron": "^3.0.11",
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2"
+  }
+}
