@@ -22,15 +22,31 @@ export class Storage {
   getMedications(): Medication[] {
     try {
       const data = fs.readFileSync(MEDICATIONS_FILE, 'utf8');
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      
+      // Ensure the parsed data is an array
+      if (!Array.isArray(parsed)) {
+        console.warn('Medications data is not an array, resetting to empty array');
+        this.saveMedications([]);
+        return [];
+      }
+      
+      return parsed;
     } catch (error) {
       console.error('Error reading medications:', error);
+      console.log('Resetting medications file to empty array');
+      this.saveMedications([]);
       return [];
     }
   }
 
   saveMedications(medications: Medication[]): void {
     try {
+      // Ensure we're always saving an array
+      if (!Array.isArray(medications)) {
+        console.warn('Attempting to save non-array data, converting to empty array');
+        medications = [];
+      }
       fs.writeFileSync(MEDICATIONS_FILE, JSON.stringify(medications, null, 2));
     } catch (error) {
       console.error('Error saving medications:', error);
@@ -39,12 +55,23 @@ export class Storage {
 
   addMedication(medication: Medication): void {
     const medications = this.getMedications();
+    // Double-check that medications is an array before pushing
+    if (!Array.isArray(medications)) {
+      console.error('getMedications did not return an array, creating new array');
+      this.saveMedications([medication]);
+      return;
+    }
     medications.push(medication);
     this.saveMedications(medications);
   }
 
   removeMedication(id: string): boolean {
     const medications = this.getMedications();
+    if (!Array.isArray(medications)) {
+      console.error('getMedications did not return an array');
+      return false;
+    }
+    
     const initialLength = medications.length;
     const filtered = medications.filter(med => med.id !== id);
     
@@ -57,6 +84,11 @@ export class Storage {
 
   updateMedication(id: string, updates: Partial<Medication>): boolean {
     const medications = this.getMedications();
+    if (!Array.isArray(medications)) {
+      console.error('getMedications did not return an array');
+      return false;
+    }
+    
     const index = medications.findIndex(med => med.id === id);
     
     if (index !== -1) {
@@ -68,6 +100,11 @@ export class Storage {
   }
 
   getUserMedications(userId: string): Medication[] {
-    return this.getMedications().filter(med => med.userId === userId);
+    const medications = this.getMedications();
+    if (!Array.isArray(medications)) {
+      console.error('getMedications did not return an array');
+      return [];
+    }
+    return medications.filter(med => med.userId === userId);
   }
 }
